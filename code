@@ -1,0 +1,50 @@
+#以下是用 Python 实现的粒子群算法的示例代码：
+import numpy as np
+
+# 目标函数
+def objective_function(x):
+    return x**2
+
+# 粒子群算法
+def particle_swarm_optimization(num_particles, num_iterations):
+    # 初始化粒子位置和速度
+    positions = np.random.uniform(-10, 10, num_particles)
+    velocities = np.random.uniform(-1, 1, num_particles)
+    
+    # 初始化个体最优位置和群体最优位置
+    personal_best_positions = positions.copy()
+    personal_best_values = objective_function(personal_best_positions)
+    global_best_position = personal_best_positions[np.argmin(personal_best_values)]
+    
+    # 迭代更新
+    for iteration in range(num_iterations):
+        for i in range(num_particles):
+            # 更新速度
+            inertia = 0.5 * velocities[i]
+            cognitive = np.random.rand() * (personal_best_positions[i] - positions[i])
+            social = np.random.rand() * (global_best_position - positions[i])
+            velocities[i] = inertia + cognitive + social
+            
+            # 更新位置
+            positions[i] += velocities[i]
+            
+            # 计算适应度
+            fitness_value = objective_function(positions[i])
+            
+            # 更新个体最优位置
+            if fitness_value < personal_best_values[i]:
+                personal_best_positions[i] = positions[i]
+                personal_best_values[i] = fitness_value
+            
+        # 更新群体最优位置
+        best_particle_index = np.argmin(personal_best_values)
+        global_best_position = personal_best_positions[best_particle_index]
+        
+        # 打印当前最优值
+        print(f"Iteration {iteration+1}/{num_iterations}, Best Position: {global_best_position}, Best Value: {objective_function(global_best_position)}")
+    
+    return global_best_position
+
+# 运行粒子群算法
+best_position = particle_swarm_optimization(num_particles=30, num_iterations=50)
+print(f"Global Best Position: {best_position}, Minimum Value: {objective_function(best_position)}")
